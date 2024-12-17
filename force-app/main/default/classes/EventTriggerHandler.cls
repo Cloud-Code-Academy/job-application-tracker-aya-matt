@@ -4,29 +4,33 @@ public class EventTriggerHandler {
      * @param newEvents List of Event records being inserted or updated.
      */
     public static void validateMeetings(List<Event> newEvents) {
-        //fetch existing events for overlapping validation
-        Set<Id> eventIds = new Set<Id>();
-        for(Event ev : newEvents){
-            if(ev.Id != null){
-                eventIds.add(ev.Id);
-            }
-        }
+       //Determine if we are handling inserts or updates
+       Boolean isInsert = newEvents[0].Id == null;
+
+       //Fetch existing events for overlap validation
 
         List<Event> existingEvents = [
             SELECT Id, StartDateTime, EndDateTime
             FROM Event
-            WHERE Id IN :eventIds
+            WHERE Id Not IN :newEvents // Handles only updates
         ];
 
+        if(isInsert){
+            existingEvents = [
+                SELECT Id, StartDateTime, EndDateTime
+                FROM Event
+            ];
+        }
+
+        //Validate each new event
         for(Event newEvent : newEvents){
-            //validate weekend scheduling
+            //validate weekend scheduleing
             validateWeekend(newEvent);
 
-            //validate overlapping events
+            //validate overlap
             validateOverlap(newEvent, existingEvents);
         }
-    } 
-
+    }
     /**
      * Validates that the event is not scheduled on a weekend.
      * @parm newEvent Event record being validated
@@ -53,7 +57,7 @@ public class EventTriggerHandler {
             if(newEvent.StartDateTime != null && newEvent.EndDateTime != null && existingEvent.StartDateTime != null && existingEvent.EndDateTime != null){
 
                 //check for overlap
-                if((newEvent.StartDateTime < existingEvent.EndDateTime)&&(newEvent.EndDateTime > existingEvent.StartDateTime)){
+                if((newEvent.StartDateTime < existingEvent.EndDateTime) && (newEvent.EndDateTime > existingEvent.StartDateTime)){
                     newEvent.addError('This meeting overlaps with an existing meeting.');
                 }
             }
