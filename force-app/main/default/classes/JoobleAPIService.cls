@@ -43,8 +43,9 @@ public class JoobleAPIService {
                     jobApp.Name = (String) job.get('title');
                     jobApp.Status__c = 'Saved';
                     jobApp.Company_Account__c = null;
-                    jobApp.Description__c = (String) job.get('snippet');
-                    jobApp.URL__c = (String) job.get('link');
+                    String snippet = (String) job.get('snippet');
+                    jobApp.Description__c = snippet.stripHtmlTags();
+                    jobApp.URL__c = '[View Job](' + (String) job.get('link') + ')';
                     jobApplications.add(jobApp);
                 }
 
