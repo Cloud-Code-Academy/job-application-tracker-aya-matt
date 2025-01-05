@@ -1,4 +1,4 @@
-public class JoobleAPIService {
+public class JoobleAPIService implements Schedulable {
 
     //Endpoint URL and API Key
     private static final String ENDPOINT_URL = 'https://jooble.org/api/';
@@ -105,5 +105,8 @@ public class JoobleAPIService {
             System.debug('Error: ' + e.getMessage());
 
         }
+    }
+    public void execute(SchedulableContext sc) {
+        System.enqueueJob(new JoobleAPIQueueable('Salesforce', 'Remote'));
     }
 }
