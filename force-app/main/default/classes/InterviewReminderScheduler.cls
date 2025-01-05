@@ -5,8 +5,8 @@ global class InterviewReminderScheduler implements Schedulable {
         List<Event> events = [
             SELECT Id, Subject, WhatId, StartDateTime
             FROM Event
-            WHERE StartDateTime = :System.today().addDays(1)
-            AND Subject Like'Interview%'
+            WHERE StartDateTime = NEXT_N_DAYS:1
+            AND Subject Like 'Interview%'
         ];
 
         List<Messaging.SingleEmailMessage> emailsToSend = new List<Messaging.SingleEmailMessage>();
@@ -25,7 +25,7 @@ global class InterviewReminderScheduler implements Schedulable {
             if(ownerEmail != null){
                 Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
                 email.setToAddresses(new String[]{ ownerEmail});
-                email.setSubject('Interview Reminder'+ event.Subject);
+                email.setSubject('Interview Reminder '+ event.Subject);
                 email.setPlainTextBody('You have an interview scheduled on ' + event.StartDateTime + '.\n\nDetails: ' + event.Subject);
                 emailsToSend.add(email);
             } 
