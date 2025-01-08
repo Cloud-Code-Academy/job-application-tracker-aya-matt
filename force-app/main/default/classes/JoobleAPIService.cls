@@ -18,10 +18,13 @@ public class JoobleAPIService implements Schedulable {
         request.setMethod('POST');
         request.setHeader('Content-Type', 'application/json');
 
+        Date lastSyncDate = Date.today().addDays(-2);
+
         //Create JSON request body
         String requestBody = JSON.serialize(new Map<String, String>{
             'keywords' => keywords,
-            'location' => location    
+            'location' => location,
+            'datecreatefrom' => lastSyncDate.format()    
         });
 
         request.setBody(requestBody);
